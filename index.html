@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Watch Party - Watch Together</title>
+    <meta name="description" content="Watch YouTube videos with friends in real-time. Create rooms, chat, and sync your viewing experience.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiWW91VHViZSBXYXRjaCBQYXJ0eSIsInNob3J0X25hbWUiOiJXYXRjaFBhcnR5IiwiaWNvbnMiOlt7InNyYyI6ImRhdGE6aW1hZ2Uvc3ZnK3htbCwiIiwic2l6ZXMiOiJhbnkiLCJ0eXBlIjoiaW1hZ2Uvc3ZnK3htbCJ9XX0=">
+</head>
+<body>
+    <!-- Theme Toggle -->
+    <div class="theme-toggle" id="themeToggle">
+        <button class="btn btn--sm btn--outline" id="themeBtn">🌙</button>
+    </div>
+
+    <!-- Home Page -->
+    <div id="homePage" class="page">
+        <div class="home-hero">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <h1>Watch YouTube Together</h1>
+                        <p>Create virtual movie nights, study sessions, and hangouts with friends. Perfect sync, real-time chat, and advanced features.</p>
+                        
+                        <div class="hero-features">
+                            <div class="feature-item">
+                                <span class="feature-icon">🎥</span>
+                                <span>Perfect Sync</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">💬</span>
+                                <span>Real-time Chat</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">👥</span>
+                                <span>User Roles</span>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">🎨</span>
+                                <span>Custom Themes</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="hero-actions">
+                        <div class="action-grid">
+                            <div class="action-card primary-action">
+                                <div class="action-header">
+                                    <h3>🚀 Create Room</h3>
+                                    <p>Start a new watch party</p>
+                                </div>
+                                <div class="room-settings">
+                                    <input type="text" class="form-control" id="roomNameInput" placeholder="Room name (optional)" maxlength="30">
+                                    <select class="form-control" id="roomThemeSelect">
+                                        <option value="dark">🌙 Dark Theme</option>
+                                        <option value="light">☀️ Light Theme</option>
+                                        <option value="cosmic">🌌 Cosmic Theme</option>
+                                    </select>
+                                    <div class="privacy-toggle">
+                                        <label class="toggle-label">
+                                            <input type="checkbox" id="roomPrivateCheck">
+                                            <span class="toggle-slider"></span>
+                                            Private Room
+                                        </label>
+                                    </div>
+                                </div>
+                                <button class="btn btn--primary btn--lg btn--full-width" id="createRoomBtn">Create Room</button>
+                            </div>
+                            
+                            <div class="action-card">
+                                <div class="action-header">
+                                    <h3>🔗 Join Room</h3>
+                                    <p>Enter a room code</p>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="roomIdInput" placeholder="Enter 6-digit room code" maxlength="6">
+                                </div>
+                                <button class="btn btn--outline btn--lg btn--full-width" id="joinRoomBtn">Join Room</button>
+                            </div>
+                        </div>
+                        
+                        <div class="room-browser">
+                            <h3>🌍 Public Rooms</h3>
+                            <div class="public-rooms" id="publicRooms">
+                                <!-- Dynamic content -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Room Page -->
+    <div id="roomPage" class="page hidden">
+        <div class="room-container">
+            <!-- Room Header -->
+            <div class="room-header">
+                <div class="room-info">
+                    <div class="room-title">
+                        <h2 id="roomTitle">
+                            <span id="roomName">Watch Party</span>
+                            <span class="room-code">#<span id="currentRoomId"></span></span>
+                        </h2>
+                        <div class="room-stats">
+                            <span class="stat-item">
+                                <span class="stat-icon">👥</span>
+                                <span id="userCount">0</span>
+                            </span>
+                            <span class="stat-item">
+                                <span class="stat-icon">🎬</span>
+                                <span id="videoCount">0</span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="room-controls">
+                        <button class="btn btn--sm btn--outline" id="copyLinkBtn">📋 Share</button>
+                        <button class="btn btn--sm btn--outline" id="roomSettingsBtn">⚙️ Settings</button>
+                        <button class="btn btn--sm btn--secondary" id="leaveRoomBtn">🚪 Leave</button>
+                    </div>
+                </div>
+                
+                <!-- Video Input -->
+                <div class="video-input">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="videoUrlInput" placeholder="Paste YouTube URL or search...">
+                        <button class="btn btn--primary" id="loadVideoBtn">Add Video</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="room-content">
+                <!-- Video Section -->
+                <div class="video-section">
+                    <!-- Video Player Container -->
+                    <div class="video-container">
+                        <div id="videoPlayer" class="youtube-player"></div>
+                        <div id="videoPlaceholder" class="video-placeholder">
+                            <div class="placeholder-content">
+                                <div class="placeholder-icon">🎬</div>
+                                <h3>No video loaded</h3>
+                                <p>Add a YouTube URL to start watching together</p>
+                                <button class="btn btn--outline" id="browseVideosBtn">Browse Popular Videos</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Video Controls Overlay -->
+                        <div class="video-controls-overlay" id="videoControlsOverlay">
+                            <div class="video-info">
+                                <div class="video-title" id="videoTitle"></div>
+                                <div class="video-stats">
+                                    <span id="videoProgress">0:00 / 0:00</span>
+                                    <span class="sync-status" id="syncStatus">🟢 Synced</span>
+                                </div>
+                            </div>
+                            <div class="video-actions">
+                                <button class="btn btn--sm btn--outline" id="voteBtn">🗳️ Vote</button>
+                                <button class="btn btn--sm btn--outline" id="fullscreenBtn">⛶</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Video Queue -->
+                    <div class="video-queue" id="videoQueue">
+                        <div class="queue-header">
+                            <h4>🎬 Queue (<span id="queueCount">0</span>)</h4>
+                            <button class="btn btn--sm btn--outline" id="toggleQueueBtn">▼</button>
+                        </div>
+                        <div class="queue-content" id="queueContent">
+                            <!-- Dynamic queue items -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="sidebar">
+                    <!-- Sidebar Tabs -->
+                    <div class="sidebar-tabs">
+                        <button class="sidebar-tab active" data-tab="chat">💬 Chat</button>
+                        <button class="sidebar-tab" data-tab="users">👥 Users</button>
+                        <button class="sidebar-tab" data-tab="queue">📋 Queue</button>
+                    </div>
+                    
+                    <!-- Chat Tab -->
+                    <div class="tab-content active" id="chatTab">
+                        <div class="chat-header">
+                            <div class="typing-indicator" id="typingIndicator">
+                                <!-- Dynamic typing users -->
+                            </div>
+                        </div>
+                        
+                        <div class="chat-messages" id="chatMessages">
+                            <!-- Dynamic messages -->
+                        </div>
+                        
+                        <div class="chat-input">
+                            <div class="message-formatting">
+                                <button class="format-btn" data-format="bold" title="Bold">B</button>
+                                <button class="format-btn" data-format="italic" title="Italic">I</button>
+                                <button class="emoji-btn" id="emojiBtn" title="Emoji">😀</button>
+                            </div>
+                            <div class="input-group">
+                                <textarea class="form-control" id="messageInput" placeholder="Type a message..." rows="1" maxlength="500"></textarea>
+                                <button class="btn btn--primary" id="sendMessageBtn">Send</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Emoji Picker -->
+                        <div class="emoji-picker hidden" id="emojiPicker">
+                            <div class="emoji-categories">
+                                <button class="emoji-category active" data-category="smileys">😀</button>
+                                <button class="emoji-category" data-category="gestures">👋</button>
+                                <button class="emoji-category" data-category="objects">🎬</button>
+                                <button class="emoji-category" data-category="symbols">❤️</button>
+                            </div>
+                            <div class="emoji-grid" id="emojiGrid">
+                                <!-- Dynamic emojis -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Users Tab -->
+                    <div class="tab-content" id="usersTab">
+                        <div class="users-list" id="usersList">
+                            <!-- Dynamic users -->
+                        </div>
+                    </div>
+                    
+                    <!-- Queue Tab -->
+                    <div class="tab-content" id="queueTab">
+                        <div class="queue-list" id="queueList">
+                            <!-- Dynamic queue -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Avatar Selection Modal -->
+    <div id="avatarModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Welcome to the Room!</h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Choose your username:</label>
+                    <input type="text" class="form-control" id="usernameInput" placeholder="Enter username" maxlength="20">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Select avatar:</label>
+                    <div class="avatar-grid" id="avatarGrid">
+                        <div class="avatar-option active" data-avatar="👤">👤</div>
+                        <div class="avatar-option" data-avatar="👨">👨</div>
+                        <div class="avatar-option" data-avatar="👩">👩</div>
+                        <div class="avatar-option" data-avatar="🧑">🧑</div>
+                        <div class="avatar-option" data-avatar="👦">👦</div>
+                        <div class="avatar-option" data-avatar="👧">👧</div>
+                        <div class="avatar-option" data-avatar="🐱">🐱</div>
+                        <div class="avatar-option" data-avatar="🐶">🐶</div>
+                        <div class="avatar-option" data-avatar="🦊">🦊</div>
+                        <div class="avatar-option" data-avatar="🐻">🐻</div>
+                        <div class="avatar-option" data-avatar="🤖">🤖</div>
+                        <div class="avatar-option" data-avatar="👽">👽</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Status message (optional):</label>
+                    <input type="text" class="form-control" id="statusInput" placeholder="What's your vibe?" maxlength="50">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn--primary btn--full-width" id="joinWithDetailsBtn">Join Room</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Room Settings Modal -->
+    <div id="roomSettingsModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Room Settings</h3>
+                <button class="close-btn" id="closeSettingsBtn">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h4>🎨 Appearance</h4>
+                    <div class="theme-selector">
+                        <div class="theme-option" data-theme="dark">
+                            <div class="theme-preview dark-preview"></div>
+                            <span>Dark</span>
+                        </div>
+                        <div class="theme-option" data-theme="light">
+                            <div class="theme-preview light-preview"></div>
+                            <span>Light</span>
+                        </div>
+                        <div class="theme-option" data-theme="cosmic">
+                            <div class="theme-preview cosmic-preview"></div>
+                            <span>Cosmic</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h4>🔊 Notifications</h4>
+                    <label class="toggle-label">
+                        <input type="checkbox" id="chatSoundsToggle" checked>
+                        <span class="toggle-slider"></span>
+                        Chat message sounds
+                    </label>
+                    <label class="toggle-label">
+                        <input type="checkbox" id="syncNotificationsToggle" checked>
+                        <span class="toggle-slider"></span>
+                        Sync notifications
+                    </label>
+                </div>
+                
+                <div class="settings-section">
+                    <h4>⌨️ Shortcuts</h4>
+                    <div class="shortcuts-list">
+                        <div class="shortcut-item">
+                            <span class="shortcut-key">Space</span>
+                            <span>Play/Pause video</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-key">Enter</span>
+                            <span>Send message</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-key">Esc</span>
+                            <span>Exit fullscreen</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vote Modal -->
+    <div id="voteModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🗳️ Vote on Video Action</h3>
+            </div>
+            <div class="modal-body">
+                <div class="vote-options">
+                    <button class="vote-option" data-action="play">
+                        <span class="vote-icon">▶️</span>
+                        <span>Play Video</span>
+                        <span class="vote-count" id="playVotes">0</span>
+                    </button>
+                    <button class="vote-option" data-action="pause">
+                        <span class="vote-icon">⏸️</span>
+                        <span>Pause Video</span>
+                        <span class="vote-count" id="pauseVotes">0</span>
+                    </button>
+                    <button class="vote-option" data-action="skip">
+                        <span class="vote-icon">⏭️</span>
+                        <span>Skip Video</span>
+                        <span class="vote-count" id="skipVotes">0</span>
+                    </button>
+                </div>
+                <div class="vote-progress">
+                    <div class="vote-timer" id="voteTimer">30s remaining</div>
+                    <div class="vote-status" id="voteStatus">Vote to control the video together!</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn--outline" id="closeVoteBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Container -->
+    <div id="notifications" class="notifications"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loading-spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+    <!-- YouTube IFrame API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="app.js"></script>
+</body>
+</html>
